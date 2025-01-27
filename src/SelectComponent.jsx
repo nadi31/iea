@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { AutoComplete } from "antd";
+import { AutoComplete, Input, Table } from "antd";
 const data = require("./data.json");
 
 const lineData = (arr) => {
@@ -8,7 +8,9 @@ const lineData = (arr) => {
   console.log(arr);
   const arrangedArray = arr.map((line, index) => {
     return {
+      label: line["country"],
       key: index,
+
       value: line["country"],
       region: line["region"],
       energy: line["Total energy supply"],
@@ -23,6 +25,12 @@ const lineData = (arr) => {
 };
 
 const SelectComponent = () => {
+  const mockVal = (str, repeat = 1) => {
+    return {
+      value: str.repeat(repeat),
+    };
+  };
+
   const [country, setCountry] = useState(null);
   const [region, setRegion] = useState(null);
 
@@ -36,23 +44,62 @@ const SelectComponent = () => {
     setIea(option.IEA);
     setTotal_energy_suply(option.energy);
   };
+  const onSearch = (val) => {
+    let filtered = countries.filter(
+      (obj) => obj.key !== 0 && obj.value.toString().toLowerCase().includes(val)
+    );
+    setCountries(filtered);
+  };
   useEffect(() => {
     setCountries(lineData(data));
   }, []);
   return (
     <>
-      <div style={{ width: "90%" }}>
+      <div style={{ width: "90%", margin: "6vh" }}>
         {" "}
         <AutoComplete
-          style={{ width: "90%" }}
+          style={{ width: "60%", marginBottom: "10vh" }}
           options={countries}
+          filterOption={(inputValue, option) =>
+            option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+          }
+          placeholder="Select a country"
           onSelect={(val, option) => onSelect(val, option)}></AutoComplete>
-        <p>Details :</p>
-        <strong> Region - {region}</strong> <br />
-        <strong> Energy - {total_energy_suply}</strong>
-        <br />
-        <strong> IEA member- {iea ? "YES" : "NO"}</strong>
-      </div>{" "}
+        {region ? (
+          <>
+            <h2>Details </h2>
+            <Table
+              pagination={false}
+              columns={[
+                {
+                  title: "Region",
+                  dataIndex: "region",
+                },
+                {
+                  title: "Energy",
+                  dataIndex: "energy",
+                },
+                {
+                  title: "IEA member",
+                  dataIndex: "member",
+                },
+              ]}
+              dataSource={[
+                {
+                  region: region,
+                  energy: total_energy_suply,
+                  member: iea ? "Yes" : "No",
+                },
+              ]}
+            />
+          </>
+        ) : (
+          <>
+            <br />
+            Select a country to display its details
+          </>
+        )}
+      </div>
     </>
   );
 };
