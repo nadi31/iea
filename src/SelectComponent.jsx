@@ -76,7 +76,7 @@ const SelectComponent = () => {
                   dataIndex: "region",
                 },
                 {
-                  title: "Energy",
+                  title: "Total energy supply",
                   dataIndex: "energy",
                 },
                 {
